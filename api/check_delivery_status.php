@@ -29,15 +29,13 @@ try {
         
         logToFile("CRON: Проверка заказа ID: $order_id, трек: $tracking_number", 'DEBUG');
         
-        // Формируем POST-запрос как в ручной проверке
         $postData = [
             'action' => 'get_delivery_status',
-            'csrf_token' => generate_csrf_token(), // Генерируем токен
+            'csrf_token' => generate_csrf_token(),
             'tracking_number' => $tracking_number,
             'order_id' => $order_id
         ];
         
-        // Выполняем запрос к API
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://pnevmatpro.ru/api/order_check_cdek.php');
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -60,11 +58,10 @@ try {
             }
         }
         
-        // Пауза между запросами
         sleep(2);
     }
     
-    logToFile("CRON: Проверка завершена, обработано заказов: " . count($orders), 'INFO');
+    logToFile("CRON: Проверка завершена, заказов: " . count($orders), 'INFO');
     
 } catch (Exception $e) {
     logToFile("CRON: Критическая ошибка: " . $e->getMessage(), 'CRITICAL');
