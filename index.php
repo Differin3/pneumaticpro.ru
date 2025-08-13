@@ -315,9 +315,21 @@ try {
                             <h3 class="h4 mb-3 text-dark">
                                 <?= !empty($service['name']) ? htmlspecialchars($service['name'], ENT_QUOTES, 'UTF-8') : 'Услуга без названия' ?>
                             </h3>
-                            <p class="card-text text-secondary mb-3">
-                                <?= !empty($service['description']) ? htmlspecialchars($service['description'], ENT_QUOTES, 'UTF-8') : 'Описание отсутствует' ?>
-                            </p>
+                            
+                            <?php 
+                            $description = !empty($service['description']) ? htmlspecialchars($service['description'], ENT_QUOTES, 'UTF-8') : 'Описание отсутствует';
+                            $max_length = 100;
+                            $short_description = strlen($description) > $max_length ? substr($description, 0, $max_length) . '...' : $description;
+                            ?>
+                            <p class="card-text text-secondary mb-3 description-short"><?= $short_description ?></p>
+                            
+                            <?php if (strlen($description) > $max_length): ?>
+                                <button class="btn detail-btn"
+                                        data-name="<?= htmlspecialchars($service['name'] ?? 'Услуга без названия', ENT_QUOTES, 'UTF-8') ?>"
+                                        data-description="<?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?>">
+                                    Подробнее
+                                </button>
+                            <?php endif; ?>
                             
                             <div class="service-meta mb-3">
                                 <div class="d-flex justify-content-between">
@@ -566,8 +578,8 @@ try {
                                 <p class="card-text text-secondary mb-3 description-short"><?= $short_description ?></p>
                                 <?php if (strlen($description) > $max_length): ?>
                                     <button class="btn detail-btn"
-                                            data-product-name="<?= htmlspecialchars($product['name'] ?? 'Без названия', ENT_QUOTES, 'UTF-8') ?>"
-                                            data-product-description="<?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?>">
+                                            data-name="<?= htmlspecialchars($product['name'] ?? 'Без названия', ENT_QUOTES, 'UTF-8') ?>"
+                                            data-description="<?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?>">
                                         Подробнее
                                     </button>
                                 <?php endif; ?>
@@ -1013,12 +1025,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Обработчик для кнопок "Подробнее" (товары и услуги)
     document.querySelectorAll('.detail-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const productName = this.dataset.productName;
-            const productDescription = this.dataset.productDescription;
-            document.getElementById('productDetailTitle').textContent = productName;
-            document.getElementById('productDetailBody').textContent = productDescription;
+            const name = this.dataset.name;
+            const description = this.dataset.description;
+            document.getElementById('productDetailTitle').textContent = name;
+            document.getElementById('productDetailBody').innerHTML = description;
             productDetailModal.show();
         });
     });
