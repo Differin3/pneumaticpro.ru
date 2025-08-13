@@ -17,7 +17,7 @@ if (DEBUG_MODE) {
 // Укажите путь к error_log для всех режимов
 ini_set('error_log', __DIR__ . '/../logs/php_errors.log');  // Добавлено для логирования ошибок
 
-// Параметры подключения к базе данных
+// Параметры подключения к базе данных mariadb
 $db_host = 'localhost';
 $db_user = 'pnevmatpro.ru';
 $db_pass = 'pnevmatpro.ru';
