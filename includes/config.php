@@ -19,8 +19,8 @@ ini_set('error_log', __DIR__ . '/../logs/php_errors.log');  // Добавлен�
 
 // Параметры подключения к базе данных
 $db_host = 'localhost';
-$db_user = 'admin';
-$db_pass = '54785TGU647gj';
+$db_user = 'pnevmatpro.ru';
+$db_pass = 'pnevmatpro.ru';
 $db_name = 'airgun_service';
 $db_charset = 'utf8mb4';
 
