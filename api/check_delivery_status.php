@@ -1,32 +1,35 @@
 <?php
 // /var/www/pneumaticpro.ru/api/check_delivery_status.php
 
-// Диагностический лог
-$debug_log = "/tmp/cron_debug_" . date('Ymd') . ".txt";
-file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Script started\n", FILE_APPEND);
+// 1. Настройки подключения к базе данных
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'airgun_service');
+define('DB_USER', 'pnevmatpro.ru'); // Замените на реальные данные
+define('DB_PASS', 'pnevmatpro.ru');       // Замените на реальные данные
 
+// 2. Создание подключения к БД
 try {
-    // Загрузка конфигурации
-    if (!@include __DIR__ . '/../includes/config.php') {
-        throw new Exception("Failed to load config file");
-    }
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Config loaded\n", FILE_APPEND);
-    
-    if (!@include __DIR__ . '/../includes/functions.php') {
-        throw new Exception("Failed to load functions file");
-    }
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Functions loaded\n", FILE_APPEND);
+    $pdo = new PDO(
+        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+        DB_USER,
+        DB_PASS,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]
+    );
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
+    exit(1);
+}
 
-    // Проверка подключения к БД
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] DB host: " . DB_HOST . "\n", FILE_APPEND);
-    
-    $test_stmt = $pdo->query("SELECT 1");
-    if (!$test_stmt) {
-        throw new Exception("Database connection test failed");
-    }
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] DB connection OK\n", FILE_APPEND);
+// 3. Загрузка функций
+require '/var/www/pneumaticpro.ru/includes/functions.php';
 
-    // SQL запрос
+// 4. Основная логика
+try {
+    // Получаем заказы для проверки
     $sql = "SELECT id, tracking_number 
             FROM orders 
             WHERE delivery_service = 'cdek'
