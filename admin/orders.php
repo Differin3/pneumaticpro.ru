@@ -21,7 +21,7 @@ $csrf_token = generate_csrf_token();
 $search = isset($_GET['search']) ? clean_input($_GET['search']) : '';
 $status_filter = isset($_GET['status']) ? clean_input($_GET['status']) : 'all';
 $current_page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$items_per_page = 10;
+$items_per_page = 8; // количество заказов на странице
 
 // Валидация статуса
 $allowed_statuses = ['new', 'processing', 'shipped', 'completed', 'canceled', 'all'];
