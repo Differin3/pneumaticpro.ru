@@ -1,24 +1,18 @@
 <?php
-// /var/www/pneumaticpro.ru/cron/check_delivery_status.php
-
+// /var/www/pnevmatpro.ru/api/check_delivery_status.php
 require __DIR__ . '/../includes/config.php';
 require __DIR__ . '/../includes/functions.php';
 
-// Логируем начало работы
-logToFile("CRON: Запуск автоматической проверки статусов заказов", 'INFO');
+logToFile("CRON: Запуск проверки статусов доставки", 'INFO');
 
 try {
-    // Получаем заказы, которые нужно проверить:
-    // - Доставка через СДЭК
-    // - Статус не завершенный
-    // - Последняя проверка была более 1 часа назад
     $sql = "SELECT id, tracking_number 
             FROM orders 
             WHERE delivery_service = 'cdek'
             AND status NOT IN ('completed', 'canceled')
             AND (last_status_check IS NULL OR last_status_check < NOW() - INTERVAL 1 HOUR)
             ORDER BY last_status_check ASC
-            LIMIT 20"; // Ограничиваем количество за один запуск
+            LIMIT 20";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
