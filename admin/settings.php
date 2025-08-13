@@ -273,7 +273,33 @@ $csrf_token = generate_csrf_token();
     <link rel="stylesheet" href="/../css/admin.css">
     <link rel="icon" href="https://pnevmatpro.ru/assets/favicon.png" type="image/png">
     <style>
-    /* Мобильные карточки для настроек */
+    /* Обновленные стили для табов как в orders.php */
+    .nav-tabs .nav-link {
+        color: #6c757d !important;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.5rem 1rem;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #000 !important;
+        font-weight: 600;
+        border-bottom: 3px solid #0d6efd;
+        background-color: transparent;
+    }
+    
+    .nav-tabs {
+        border-bottom: none;
+    }
+    
+    /* Стили для модального окна как в orders.php */
+    .modal-header.bg-light.pt-0 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+    }
+    
+    /* Остальные стили без изменений */
     .settings-card-mobile {
         display: none;
         border: 1px solid #dee2e6;
@@ -302,7 +328,6 @@ $csrf_token = generate_csrf_token();
         text-align: center;
     }
 
-    /* Общие стили для мобильного меню и макета */
     .admin-wrapper {
         display: flex;
         min-height: 100vh;
@@ -378,7 +403,6 @@ $csrf_token = generate_csrf_token();
         flex: 1;
         padding: 20px;
         margin-left: 250px;
-        padding-top: 20px;
     }
 
     .admin-content {
@@ -395,44 +419,6 @@ $csrf_token = generate_csrf_token();
         z-index: 10;
     }
 
-    /* Новые стили для черных вкладок */
-    .nav-tabs .nav-link {
-        background-color: #000;
-        color: #fff !important;
-        border: 1px solid #000;
-        margin-right: 5px;
-        font-weight: 500;
-    }
-
-    .nav-tabs .nav-link.active {
-        background-color: #000;
-        color: #fff !important;
-        border-bottom: 3px solid #fff;
-        position: relative;
-    }
-
-    .nav-tabs .nav-link:not(.active):hover {
-        background-color: #333;
-    }
-
-    /* Стили для модального окна */
-    .modal-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .modal-title {
-        font-weight: 600;
-        color: #212529;
-    }
-
-    .modal-content {
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    /* Стили для статусов */
     .status-badge {
         font-weight: 600;
         padding: 0.35rem 0.65rem;
@@ -450,7 +436,6 @@ $csrf_token = generate_csrf_token();
         color: white;
     }
 
-    /* Медиа-запросы для мобильной версии */
     @media (max-width: 767.98px) {
         .admin-nav {
             transform: translateX(-100%);
@@ -767,28 +752,31 @@ $csrf_token = generate_csrf_token();
 
     <input type="hidden" id="csrfToken" value="<?= htmlspecialchars($csrf_token) ?>">
 
-    <!-- Модальное окно для журнала действий с черными вкладками -->
+    <!-- Обновленное модальное окно в стиле orders.php -->
     <div class="modal fade" id="activityLogModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
+                <!-- Заголовок с названием модального окна -->
                 <div class="modal-header bg-light">
-                    <ul class="nav nav-tabs" id="logTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="activity-log-tab" data-bs-toggle="tab" data-bs-target="#activity-log" type="button" role="tab" aria-controls="activity-log" aria-selected="true">
-                                <i class="bi bi-journal-text me-1"></i> Журнал действий
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="delivery-log-tab" data-bs-toggle="tab" data-bs-target="#delivery-log" type="button" role="tab" aria-controls="delivery-log" aria-selected="false">
-                                <i class="bi bi-truck me-1"></i> Лог доставки
-                            </button>
-                        </li>
-                    </ul>
+                    <h5 class="modal-title">Журнал действий</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
+                <!-- Табы в стиле orders.php -->
+                <div class="modal-header bg-light pt-0 border-bottom-0">
+                    <ul class="nav nav-tabs card-header-tabs" id="logTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active text-dark fw-bold" id="activity-log-tab" data-bs-toggle="tab" data-bs-target="#activity-log" type="button" role="tab">Журнал действий</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-dark fw-bold" id="delivery-log-tab" data-bs-toggle="tab" data-bs-target="#delivery-log" type="button" role="tab">Лог доставки</button>
+                        </li>
+                    </ul>
+                </div>
+                
                 <div class="modal-body p-0">
                     <div class="tab-content" id="logTabsContent">
-                        <div class="tab-pane fade show active" id="activity-log" role="tabpanel" aria-labelledby="activity-log-tab">
+                        <div class="tab-pane fade show active" id="activity-log" role="tabpanel">
                             <div id="activity-log-content" class="p-3">
                                 <div class="text-center py-5">
                                     <div class="spinner-border text-primary" role="status">
@@ -798,7 +786,7 @@ $csrf_token = generate_csrf_token();
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="delivery-log" role="tabpanel" aria-labelledby="delivery-log-tab">
+                        <div class="tab-pane fade" id="delivery-log" role="tabpanel">
                             <div id="delivery-log-content" class="p-3">
                                 <div class="text-center py-5">
                                     <div class="spinner-border text-primary" role="status">
