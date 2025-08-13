@@ -158,6 +158,12 @@ try {
     // Обновляем статус заказа в базе данных, если получен internal_status и order_id
     if (!empty($order_id)) {
         try {
+            // 1. ПОЛУЧАЕМ ТЕКУЩИЙ ЛОКАЛЬНЫЙ СТАТУС ПЕРЕД ОБНОВЛЕНИЕМ
+            $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ?");
+            $stmt->execute([$order_id]);
+            $current_local_status = $stmt->fetchColumn();
+            
+            // 2. ПОДГОТАВЛИВАЕМ ДАННЫЕ ДЛЯ ОБНОВЛЕНИЯ
             $updateParams = [
                 ':order_id' => $order_id,
                 ':delivery_status' => $delivery_status,
@@ -171,9 +177,12 @@ try {
                 "last_status_check = :last_status_check"
             ];
             
+            // 3. ЕСЛИ ЕСТЬ НОВЫЙ СТАТУС - ОБНОВЛЯЕМ
             if ($internal_status) {
                 $updateFields[] = "status = :status";
                 $updateParams[':status'] = $internal_status;
+                // Обновляем текущий статус для лога
+                $current_local_status = $internal_status;
             }
             
             $sql = "UPDATE orders SET " . implode(', ', $updateFields) . " WHERE id = :order_id";
@@ -182,7 +191,7 @@ try {
             
             logToFile("Статус заказа ID $order_id обновлен: $delivery_status ($status_code)", 'INFO');
             
-            // Записываем лог доставки с локальным статусом
+            // 4. ЗАПИСЫВАЕМ ЛОГ С ЛОКАЛЬНЫМ СТАТУСОМ
             $stmt = $pdo->prepare("
                 INSERT INTO delivery_logs 
                     (order_id, status_code, status_name, local_status, api_response) 
@@ -193,7 +202,7 @@ try {
                 ':order_id' => $order_id,
                 ':status_code' => $status_code,
                 ':status_name' => $delivery_status,
-                ':local_status' => $current_local_status, // Сохраняем локальный статус
+                ':local_status' => $current_local_status, // Используем актуальный статус
                 ':api_response' => json_encode($result)
             ]);
             
