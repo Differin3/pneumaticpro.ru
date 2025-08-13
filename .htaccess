@@ -1,0 +1,17 @@
+RewriteEngine On
+
+<Files "config.php"> Order Allow,Deny Deny from all
+
+<Directory "logs"> Order Allow,Deny Deny from all
+
+<Directory "uploads"> <FilesMatch ".ph(p[345]?|t|ml)$"> Order Allow,Deny Deny from all
+ErrorDocument 400 /error.php
+ErrorDocument 401 /error.php
+ErrorDocument 403 /error.php
+ErrorDocument 404 /error.php
+ErrorDocument 405 /error.php
+ErrorDocument 429 /error.php
+ErrorDocument 500 /error.php
+ErrorDocument 502 /error.php
+ErrorDocument 503 /error.php
+ErrorDocument 504 /error.php

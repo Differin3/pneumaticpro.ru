@@ -1,0 +1,13 @@
+[26-Mar-2025 19:31:06 Europe/Berlin] Product not available: 3
+[26-Mar-2025 19:31:06 Europe/Berlin] Error: Товар недоступен
+[26-Mar-2025 19:31:14 Europe/Berlin] Product not available: 3
+[26-Mar-2025 19:31:14 Europe/Berlin] Error: Товар недоступен
+[26-Mar-2025 19:31:42 Europe/Berlin] Product not available: 3
+[26-Mar-2025 19:31:42 Europe/Berlin] Error: Товар недоступен
+[26-Mar-2025 19:32:23 Europe/Berlin] Product not available: 3
+[26-Mar-2025 19:32:23 Europe/Berlin] Error: Товар недоступен
+[26-Mar-2025 19:33:38 Europe/Berlin] Product not available: 4
+[26-Mar-2025 19:33:38 Europe/Berlin] Error: Товар недоступен
+[27-Mar-2025 14:43:15 Europe/Berlin] Database error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'stock' in 'field list'
+[27-Mar-2025 14:43:18 Europe/Berlin] Database error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'stock' in 'field list'
+[27-Mar-2025 14:51:22 Europe/Berlin] Database error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'stock' in 'field list'

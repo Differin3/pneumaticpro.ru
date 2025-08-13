@@ -1,0 +1,5 @@
+[12-Aug-2025 14:49:46 UTC] PHP Fatal error:  Cannot redeclare logToFile() (previously declared in /var/www/pneumaticpro.ru/api/update_cdek_statuses.php:15) in /var/www/pneumaticpro.ru/includes/functions.php on line 120
+[12-Aug-2025 14:50:05 UTC] PHP Fatal error:  Cannot redeclare logToFile() (previously declared in /var/www/pneumaticpro.ru/api/update_cdek_statuses.php:15) in /var/www/pneumaticpro.ru/includes/functions.php on line 120
+[12-Aug-2025 14:52:29 UTC] PHP Fatal error:  Cannot redeclare logToFile() (previously declared in /var/www/pneumaticpro.ru/api/update_cdek_statuses.php:15) in /var/www/pneumaticpro.ru/includes/functions.php on line 120
+[12-Aug-2025 14:52:35 UTC] PHP Warning:  Undefined array key "REQUEST_METHOD" in /var/www/pneumaticpro.ru/api/order_check_cdek.php on line 13
+[12-Aug-2025 14:52:35 UTC] PHP Warning:  Undefined variable $tracking_number in /var/www/pneumaticpro.ru/api/order_check_cdek.php on line 180

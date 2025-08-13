@@ -1,0 +1,32 @@
+[2025-05-24 14:31:13] [DEBUG] SmartCaptcha response: {"status":"failed","message":"Invalid or expired Token."}
+[2025-05-24 14:31:30] [DEBUG] SmartCaptcha response: {"status":"failed","message":"Invalid or expired Token."}
+[2025-05-24 14:31:34] [DEBUG] SmartCaptcha response: {"status":"failed","message":"Invalid or expired Token."}
+[2025-05-24 14:34:57] [ERROR] SmartCaptcha verification failed: No token provided
+[2025-05-24 14:35:00] [ERROR] SmartCaptcha verification failed: No token provided
+[2025-05-24 14:35:10] [ERROR] SmartCaptcha verification failed: No token provided
+[2025-05-24 16:07:50] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:07:50] [DEBUG] Rendering registration form
+[2025-05-24 16:15:52] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:15:52] [DEBUG] Rendering registration form
+[2025-05-24 16:16:28] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:16:28] [DEBUG] Rendering registration form
+[2025-05-24 16:19:19] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:19:19] [DEBUG] Rendering registration form
+[2025-05-24 16:19:21] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:19:21] [DEBUG] Rendering registration form
+[2025-05-24 16:19:46] [DEBUG] CSRF token generated: 046ff1ba0aa4c6724a2f61736ba36d0fa3fcbadfbb89c03a9917ed6e7c363410
+[2025-05-24 16:19:46] [DEBUG] Rendering registration form
+[2025-05-24 16:20:41] [DEBUG] CSRF token generated: 3d634fee5f24a532f5e0f20b4610502ab94cc7a70be9f48bd46fb3653812a39f
+[2025-05-24 16:20:41] [DEBUG] Rendering registration form
+[2025-05-24 16:22:49] [DEBUG] CSRF token generated: 57bd0f8045d66aee6b236f805592065dd22e1058cbab7e88c88e4913c172423f
+[2025-05-24 16:22:49] [DEBUG] Rendering registration form
+[2025-05-24 16:23:01] [DEBUG] CSRF token generated: 57bd0f8045d66aee6b236f805592065dd22e1058cbab7e88c88e4913c172423f
+[2025-05-24 16:23:01] [DEBUG] Rendering registration form
+[2025-05-24 16:50:19] [INFO] User registered successfully: Мордвинов Данила Сергеевич (ID: 2)
+[2025-05-24 17:28:27] [ERROR] Database error during registration: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Мордвинов Данила Сергеевич' for key 'username_UNIQUE'
+[2025-05-24 17:28:30] [ERROR] Database error during registration: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Мордвинов Данила Сергеевич' for key 'username_UNIQUE'
+[2025-05-24 17:28:39] [ERROR] Database error during registration: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Мордвинов Данила Сергеевич' for key 'username_UNIQUE'
+[2025-05-24 17:28:49] [INFO] User registered successfully: Мордвинов Данила (ID: 6)
+[2025-05-24 17:29:08] [ERROR] Database error during registration: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'Мордвинов Данила Сергеевич' for key 'username_UNIQUE'
+[2025-05-24 17:30:27] [INFO] User registered successfully: Мордвинов Данила Сергеевич (ID: 8)
+[2025-05-24 17:33:50] [INFO] User registered successfully: Мордвинов Данила Сергеевич (ID: 9)

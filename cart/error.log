@@ -1,0 +1,261 @@
+[17-May-2025 12:36:22 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:22 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => remove
+    [product_id] => 3
+)
+
+[17-May-2025 12:36:25 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:25 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[17-May-2025 12:36:30 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:30 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 2
+)
+
+[17-May-2025 12:36:31 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:31 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 1
+)
+
+[17-May-2025 12:36:32 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:32 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 2
+)
+
+[17-May-2025 12:36:33 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:33 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 1
+)
+
+[17-May-2025 12:36:48 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:36:48 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 12:45:13 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:45:13 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[17-May-2025 12:53:34 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:53:34 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 2
+)
+
+[17-May-2025 12:53:38 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:53:38 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 1
+)
+
+[17-May-2025 12:54:19 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:19 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 12:54:19 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:19 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:20 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[17-May-2025 12:54:21 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 12:54:21 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[17-May-2025 13:08:40 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 13:08:40 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 3
+    [quantity] => 1
+)
+
+[17-May-2025 13:08:41 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 13:08:41 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 1
+    [quantity] => 3
+)
+
+[17-May-2025 13:08:41 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 13:08:41 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => update
+    [product_id] => 1
+    [quantity] => 4
+)
+
+[17-May-2025 13:08:44 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 13:08:44 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => remove
+    [product_id] => 3
+)
+
+[17-May-2025 17:13:59 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 17:13:59 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[17-May-2025 17:17:01 Europe/Berlin] update_cart.php: Начало обработки запроса
+[17-May-2025 17:17:01 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[18-May-2025 19:26:08 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 19:26:08 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[18-May-2025 19:26:09 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 19:26:09 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[18-May-2025 21:25:49 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 21:25:49 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[18-May-2025 21:31:57 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 21:31:57 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[18-May-2025 21:41:21 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 21:41:21 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[18-May-2025 23:10:26 Europe/Berlin] update_cart.php: Начало обработки запроса
+[18-May-2025 23:10:26 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[19-May-2025 08:34:08 Europe/Berlin] update_cart.php: Начало обработки запроса
+[19-May-2025 08:34:08 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[19-May-2025 19:51:30 Europe/Berlin] update_cart.php: Начало обработки запроса
+[19-May-2025 19:51:30 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[19-May-2025 19:51:31 Europe/Berlin] update_cart.php: Начало обработки запроса
+[19-May-2025 19:51:31 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[19-May-2025 23:10:22 Europe/Berlin] update_cart.php: Начало обработки запроса
+[19-May-2025 23:10:22 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+
+[20-May-2025 00:58:20 Europe/Berlin] update_cart.php: Начало обработки запроса
+[20-May-2025 00:58:20 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 5
+)
+
+[20-May-2025 12:04:59 Europe/Berlin] update_cart.php: Начало обработки запроса
+[20-May-2025 12:04:59 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 3
+)
+
+[20-May-2025 16:52:57 Europe/Berlin] update_cart.php: Начало обработки запроса
+[20-May-2025 16:52:57 Europe/Berlin] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 5
+)
+
+[24-May-2025 14:15:02 UTC] update_cart.php: Начало обработки запроса
+[24-May-2025 14:15:02 UTC] update_cart.php: Входные данные: Array
+(
+    [action] => add
+    [product_id] => 1
+)
+

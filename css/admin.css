@@ -1,0 +1,176 @@
+/* Общие стили */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    /* Removed overflow-x: hidden to allow scrolling */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Основной контейнер */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    background: #f8f9fa;
+    overflow-y: auto; /* Изменено: Включить прокрутку для всего wrapper */
+}
+
+/* Боковая панель */
+.admin-nav {
+    background: #2c3e50;
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    overflow-y: auto;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    color: white;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+/* Основной контент */
+.admin-main {
+    flex: 1;
+    margin-left: 250px;
+    padding: 30px;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+    width: calc(100% - 250px);
+    overflow-y: auto; /* Изменено: Включить вертикальную прокрутку */
+    min-height: 100vh; /* Изменено: Убедиться, что контент занимает минимум высоту экрана */
+}
+
+/* Навигационные элементы */
+.nav-link {
+    color: #ffffffb3 !important;
+    padding: 12px 15px !important;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.nav-link.active {
+    background: rgba(255,255,255,0.15) !important;
+    color: white !important;
+    border-left: 3px solid #fff;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateX(5px);
+}
+
+.nav-link .bi {
+    font-size: 1.2rem;
+    width: 25px;
+}
+
+/* Таблицы */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.price-column {
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+/* Карточки */
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.card-header {
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    font-weight: 600;
+    padding: 1.5rem;
+}
+
+/* Формы */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Изображения товаров */
+.product-image-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+/* Кнопки действий */
+.action-btns .btn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+/* Уведомления */
+.alert {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    max-width: 400px;
+    z-index: 1100;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+/* Пагинация */
+.pagination .page-item.active .page-link {
+    background: #2c3e50;
+    border-color: #2c3e50;
+    color: white;
+}
+
+/* Анимации */
+@media (prefers-reduced-motion: no-preference) {
+    .admin-nav {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .nav-link {
+        transition: all 0.2s ease;
+    }
+}
+
+/* Специфические исправления */
+.d-md-block .nav-link {
+    justify-content: start;
+}
+
+.close-menu {
+    font-size: 1.5rem;
+    background: transparent;
+    border: none;
+    color: white;
+}
+
+/* Гарантия правильного отображения */
+.content-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+}

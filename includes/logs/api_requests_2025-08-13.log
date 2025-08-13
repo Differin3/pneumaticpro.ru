@@ -1,0 +1,12 @@
+[2025-08-13 14:38:09] [DEBUG] Попытка загрузки нового изображения для товара ID 4: {"name":"6848503958.jpg","full_path":"6848503958.jpg","type":"image\/jpeg","tmp_name":"\/tmp\/phpv20dCn","error":0,"size":118132}
+[2025-08-13 14:38:09] [INFO] Файл успешно загружен: /var/www/pneumaticpro.ru/includes/../uploads/products/product_1755095889.jpg
+[2025-08-13 14:38:09] [INFO] Изображение успешно обновлено: product_1755095889.jpg
+[2025-08-13 14:58:14] [DEBUG] Попытка загрузки нового изображения для услуги ID 2: {"name":"1317573323_2920688.jpg","full_path":"1317573323_2920688.jpg","type":"image\/jpeg","tmp_name":"\/tmp\/php1GIBlV","error":0,"size":117115}
+[2025-08-13 14:58:14] [INFO] Файл успешно загружен: /var/www/pneumaticpro.ru/includes/../uploads/products/product_1755097094.jpg
+[2025-08-13 14:58:14] [INFO] Изображение успешно обновлено: product_1755097094.jpg
+[2025-08-13 14:58:21] [DEBUG] Попытка загрузки нового изображения для услуги ID 2: {"name":"6848503958.jpg","full_path":"6848503958.jpg","type":"image\/jpeg","tmp_name":"\/tmp\/phpcgbWUb","error":0,"size":118132}
+[2025-08-13 14:58:21] [INFO] Файл успешно загружен: /var/www/pneumaticpro.ru/includes/../uploads/products/product_1755097101.jpg
+[2025-08-13 14:58:21] [INFO] Изображение успешно обновлено: product_1755097101.jpg
+[2025-08-13 14:58:28] [DEBUG] Попытка загрузки нового изображения для услуги ID 2: {"name":"1317573323_2920688.jpg","full_path":"1317573323_2920688.jpg","type":"image\/jpeg","tmp_name":"\/tmp\/phpwKfxrx","error":0,"size":117115}
+[2025-08-13 14:58:28] [INFO] Файл успешно загружен: /var/www/pneumaticpro.ru/includes/../uploads/products/product_1755097108.jpg
+[2025-08-13 14:58:28] [INFO] Изображение успешно обновлено: product_1755097108.jpg

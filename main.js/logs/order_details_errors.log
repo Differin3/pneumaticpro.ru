@@ -1,0 +1,2 @@
+[02-Apr-2025 20:32:23 Europe/Berlin] Uncaught Exception: session_start(): Ignoring session_start() because a session is already active
+[02-Apr-2025 20:33:11 Europe/Berlin] Uncaught Exception: session_start(): Ignoring session_start() because a session is already active

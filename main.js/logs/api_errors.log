@@ -1,0 +1,24 @@
+[02-Apr-2025 20:58:41 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 20:58:41 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 20:58:43 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 20:58:43 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:05:15 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:05:15 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:05:28 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:05:28 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:05:30 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:05:30 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:11:49 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:11:49 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:12:07 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:12:07 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:18:29 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:18:29 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:18:31 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:18:31 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:18:36 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:18:36 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:18:39 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:18:39 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
+[02-Apr-2025 21:19:40 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\includes\db.php on line 2
+[02-Apr-2025 21:19:40 Europe/Berlin] Uncaught Exception: Undefined array key "csrf_token"
