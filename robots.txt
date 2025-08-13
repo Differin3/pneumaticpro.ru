@@ -17,5 +17,5 @@ Allow: /*.gif$
 Allow: /*.webp$
 Allow: /*.css$
 Allow: /*.js$
-
+Allow: /*.js$
 Sitemap: https://pnevmatpro.ru/sitemap.xml
