@@ -34,6 +34,12 @@ try {
     }
 
     $order_id = clean_input($_POST['order_id'] ?? '');
+    
+    // Обновляем время последней проверки для заказа
+    if (!empty($order_id)) {
+        $pdo->prepare("UPDATE orders SET last_status_check = NOW() WHERE id = ?")
+            ->execute([$order_id]);
+    }
 
     $token = getCdekToken(CDEK_ACCOUNT, CDEK_SECURE_PASSWORD);
     if (!$token) {
@@ -128,6 +134,7 @@ try {
     if (empty($statuses)) {
         $delivery_status = 'Неизвестно';
         $internal_status = null;
+        $status_code = null;
     } else {
         $current_status = end($statuses);
         $delivery_status = $current_status['name'] ?? 'Неизвестно';
@@ -149,14 +156,58 @@ try {
     }
 
     // Обновляем статус заказа в базе данных, если получен internal_status и order_id
-    if ($internal_status && !empty($order_id)) {
+    if (!empty($order_id)) {
         try {
-            $stmt = $pdo->prepare("UPDATE orders SET status = :status, updated_at = NOW() WHERE id = :order_id");
+            // 1. ПОЛУЧАЕМ ТЕКУЩИЙ ЛОКАЛЬНЫЙ СТАТУС ПЕРЕД ОБНОВЛЕНИЕМ
+            $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ?");
+            $stmt->execute([$order_id]);
+            $current_local_status = $stmt->fetchColumn();
+            
+            // 2. ПОДГОТАВЛИВАЕМ ДАННЫЕ ДЛЯ ОБНОВЛЕНИЯ
+            $updateParams = [
+                ':order_id' => $order_id,
+                ':delivery_status' => $delivery_status,
+                ':delivery_status_code' => $status_code,
+                ':last_status_check' => date('Y-m-d H:i:s')
+            ];
+            
+            $updateFields = [
+                "delivery_status = :delivery_status",
+                "delivery_status_code = :delivery_status_code",
+                "last_status_check = :last_status_check"
+            ];
+            
+            // 3. ЕСЛИ ЕСТЬ НОВЫЙ СТАТУС - ОБНОВЛЯЕМ
+            if ($internal_status) {
+                $updateFields[] = "status = :status";
+                $updateParams[':status'] = $internal_status;
+                // Обновляем текущий статус для лога
+                $current_local_status = $internal_status;
+            }
+            
+            $sql = "UPDATE orders SET " . implode(', ', $updateFields) . " WHERE id = :order_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($updateParams);
+            
+            logToFile("Статус заказа ID $order_id обновлен: $delivery_status ($status_code)", 'INFO');
+            
+            // 4. ЗАПИСЫВАЕМ ЛОГ С ЛОКАЛЬНЫМ СТАТУСОМ
+            $stmt = $pdo->prepare("
+                INSERT INTO delivery_logs 
+                    (order_id, status_code, status_name, local_status, api_response) 
+                VALUES 
+                    (:order_id, :status_code, :status_name, :local_status, :api_response)
+            ");
             $stmt->execute([
-                ':status' => $internal_status,
-                ':order_id' => $order_id
+                ':order_id' => $order_id,
+                ':status_code' => $status_code,
+                ':status_name' => $delivery_status,
+                ':local_status' => $current_local_status, // Используем актуальный статус
+                ':api_response' => json_encode($result)
             ]);
-            logToFile("Статус заказа ID $order_id обновлен на $internal_status для трек-номера $tracking_number", 'INFO');
+            
+            logToFile("Лог доставки записан для заказа ID $order_id", 'DEBUG');
+            
         } catch (PDOException $e) {
             logToFile("Ошибка обновления статуса заказа ID $order_id: " . $e->getMessage(), 'ERROR');
         }
@@ -167,6 +218,7 @@ try {
         'data' => [
             'delivery_status' => $delivery_status,
             'internal_status' => $internal_status,
+            'status_code' => $status_code,
             'raw_response' => $result // Для отладки
         ]
     ]);
