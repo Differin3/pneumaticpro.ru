@@ -38,28 +38,22 @@ try {
             ORDER BY last_status_check ASC
             LIMIT 20";
 
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] SQL: $sql\n", FILE_APPEND);
-    
     $stmt = $pdo->prepare($sql);
-    if (!$stmt->execute()) {
-        throw new Exception("SQL execution failed");
-    }
-    
-    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $order_count = count($orders);
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Found orders: $order_count\n", FILE_APPEND);
+    $stmt->execute();
+    $orders = $stmt->fetchAll();
 
-    if ($order_count === 0) {
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] No orders to process\n", FILE_APPEND);
+    if (empty($orders)) {
+        logToFile("CRON: Нет заказов для проверки", 'INFO');
         exit(0);
     }
 
-    foreach ($orders as $index => $order) {
+    foreach ($orders as $order) {
         $order_id = $order['id'];
         $tracking_number = $order['tracking_number'];
         
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Processing order #$index: ID $order_id, Track: $tracking_number\n", FILE_APPEND);
+        logToFile("CRON: Проверка заказа ID: $order_id, трек: $tracking_number", 'DEBUG');
         
+        // Формируем POST-данные
         $postData = [
             'action' => 'get_delivery_status',
             'csrf_token' => generate_csrf_token(),
@@ -67,46 +61,39 @@ try {
             'order_id' => $order_id
         ];
         
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] POST data: " . print_r($postData, true) . "\n", FILE_APPEND);
-        
+        // Выполняем запрос к API
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://pnevmatpro.ru/api/order_check_cdek.php');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для отладки
-        
-        // Логирование cURL
-        $curl_log = "/tmp/curl_debug_" . date('Ymd') . ".txt";
-        curl_setopt($ch, CURLOPT_VERBOSE, true);
-        curl_setopt($ch, CURLOPT_STDERR, fopen($curl_log, 'a'));
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
         curl_close($ch);
         
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] HTTP code: $httpCode\n", FILE_APPEND);
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] cURL error: $error\n", FILE_APPEND);
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Response: " . substr($response, 0, 500) . "\n", FILE_APPEND);
-        
         if ($httpCode !== 200) {
-            file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Error processing order $order_id\n", FILE_APPEND);
+            logToFile("CRON: Ошибка при проверке заказа $order_id: HTTP $httpCode - $error", 'ERROR');
         } else {
             $result = json_decode($response, true);
             if ($result['status'] === 'success') {
-                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Success: " . $result['data']['delivery_status'] . "\n", FILE_APPEND);
+                logToFile("CRON: Статус заказа $order_id обновлен: " . $result['data']['delivery_status'], 'INFO');
             } else {
-                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] API error: " . $result['message'] . "\n", FILE_APPEND);
+                logToFile("CRON: Ошибка обновления $order_id: " . $result['message'], 'ERROR');
             }
         }
         
+        // Пауза между запросами
         sleep(2);
     }
     
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Script finished\n", FILE_APPEND);
+    logToFile("CRON: Проверка завершена, обработано заказов: " . count($orders), 'INFO');
     
 } catch (Exception $e) {
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] CRITICAL ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
+    logToFile("CRON: Критическая ошибка: " . $e->getMessage(), 'CRITICAL');
+    error_log("CRON error: " . $e->getMessage());
+    exit(1);
 }
