@@ -1,11 +1,12 @@
 <?php
-// /var/www/pnevmatpro.ru/api/check_delivery_status.php
+// /var/www/pneumaticpro.ru/api/check_delivery_status.php
 require __DIR__ . '/../includes/config.php';
 require __DIR__ . '/../includes/functions.php';
 
 logToFile("CRON: Запуск проверки статусов доставки", 'INFO');
 
 try {
+    // Получаем заказы для проверки
     $sql = "SELECT id, tracking_number 
             FROM orders 
             WHERE delivery_service = 'cdek'
@@ -29,6 +30,7 @@ try {
         
         logToFile("CRON: Проверка заказа ID: $order_id, трек: $tracking_number", 'DEBUG');
         
+        // Формируем POST-данные
         $postData = [
             'action' => 'get_delivery_status',
             'csrf_token' => generate_csrf_token(),
@@ -36,6 +38,7 @@ try {
             'order_id' => $order_id
         ];
         
+        // Выполняем запрос к API
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://pnevmatpro.ru/api/order_check_cdek.php');
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -58,10 +61,11 @@ try {
             }
         }
         
+        // Пауза между запросами
         sleep(2);
     }
     
-    logToFile("CRON: Проверка завершена, заказов: " . count($orders), 'INFO');
+    logToFile("CRON: Проверка завершена, обработано заказов: " . count($orders), 'INFO');
     
 } catch (Exception $e) {
     logToFile("CRON: Критическая ошибка: " . $e->getMessage(), 'CRITICAL');
