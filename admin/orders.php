@@ -1431,15 +1431,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Обновляем внутренний статус, если он получен
             if (data.internal_status) {
+                // Обновляем статус в интерфейсе
                 document.getElementById('order-status').value = data.internal_status;
-                checkForChanges();
+            
+                // Показываем уведомление о новом статусе
+                alert(`Статус доставки из СДЭК: ${data.delivery_status}\nЛокальный статус обновлен: ${data.internal_status}`);
+            
+                // Автоматически сохраняем изменения
+                await saveOrderChanges();
+            } else {
+                // Если внутренний статус не изменился, просто показываем статус доставки
+                alert(`Статус доставки из СДЭК: ${data.delivery_status}\nЛокальный статус не изменился.`);
+            
+                // Перезагружаем данные заказа
+                await loadOrderDetails(currentOrderData.order.order_number);
             }
-
-            // Показываем статус доставки
-            alert(`Статус доставки из СДЭК: ${data.delivery_status}`);
-
-            // Обновляем UI после успешного обновления статуса
-            loadOrderDetails(currentOrderData.order.order_number);
 
         } catch (error) {
             console.error('Ошибка:', error);
@@ -1451,7 +1457,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Если не удалось распарсить JSON, оставляем исходное сообщение
             }
             alert(`Ошибка при обновлении статуса: ${errorMessage}`);
-            logToFile(`Ошибка в updateDeliveryStatus для трек-номера ${trackingNumber}: ${error.message}`, 'ERROR');
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
