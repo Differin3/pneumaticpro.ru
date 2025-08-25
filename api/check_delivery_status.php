@@ -12,9 +12,6 @@ function logToConsole($message) {
     echo '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
 }
 
-// Путь к файлу лога
-$debug_log = '/tmp/delivery_status_check.log';
-
 try {
     logToConsole("Создание подключения к БД...");
     $pdo = new PDO(
@@ -37,12 +34,12 @@ require '/var/www/pneumaticpro.ru/includes/functions.php';
 
 try {
     logToConsole("Поиск заказов для проверки...");
-    // ИЗМЕНЕНО: Добавлены условия для фильтрации пустых трек-номеров
-    $sql = "SELECT id, tracking_number 
+
+    // ИЗМЕНЕНО: Убрано условие проверки времени последней проверки
+    $sql = "SELECT id, tracking_number, status, delivery_status
             FROM orders 
             WHERE delivery_service = 'cdek'
             AND status NOT IN ('completed', 'canceled')
-            AND (last_status_check IS NULL OR last_status_check < NOW() - INTERVAL 1 HOUR)
             AND tracking_number IS NOT NULL
             AND tracking_number != ''
             ORDER BY last_status_check ASC
@@ -55,18 +52,21 @@ try {
     
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $order_count = count($orders);
-    logToConsole("Found orders: $order_count");
+    
+    logToConsole("Найдено заказов для обработки: " . $order_count);
 
     if ($order_count === 0) {
-        logToConsole("No orders to process");
+        logToConsole("Нет заказов для обработки");
         exit(0);
     }
 
     foreach ($orders as $order) {
         $order_id = $order['id'];
         $tracking_number = trim($order['tracking_number']);
+        $current_status = $order['status'];
+        $current_delivery_status = $order['delivery_status'];
         
-        logToConsole("Processing order: ID $order_id, Track: $tracking_number");
+        logToConsole("Обработка заказа ID: $order_id, Трек: $tracking_number");
         
         $postData = [
             'action' => 'get_delivery_status',
@@ -81,23 +81,35 @@ try {
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для отладки
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
         curl_close($ch);
         
-        logToConsole("HTTP code: $httpCode");
-        
         if ($httpCode !== 200) {
-            logToConsole("Error processing order $order_id: $error");
+            logToConsole("Ошибка обработки заказа $order_id: HTTP код $httpCode");
+            if ($error) {
+                logToConsole("cURL ошибка: $error");
+            }
         } else {
             $result = json_decode($response, true);
             if ($result['status'] === 'success') {
-                logToConsole("Success: " . $result['data']['delivery_status']);
+                $new_delivery_status = $result['data']['delivery_status'];
+                $new_internal_status = $result['data']['internal_status'];
+                
+                // Проверяем, изменился ли статус
+                $status_changed = ($new_delivery_status !== $current_delivery_status) || 
+                                 ($new_internal_status && $new_internal_status !== $current_status);
+                
+                if ($status_changed) {
+                    logToConsole("Статус изменился: $new_delivery_status (внутренний: $new_internal_status)");
+                } else {
+                    logToConsole("Статус не изменился: $new_delivery_status");
+                }
             } else {
-                logToConsole("API error: " . $result['message']);
+                logToConsole("API ошибка: " . $result['message']);
             }
         }
         
@@ -105,8 +117,8 @@ try {
         sleep(2);
     }
     
-    logToConsole("Script finished");
+    logToConsole("Скрипт завершен");
     
 } catch (Exception $e) {
-    logToConsole("CRITICAL ERROR: " . $e->getMessage());
+    logToConsole("КРИТИЧЕСКАЯ ОШИБКА: " . $e->getMessage());
 }

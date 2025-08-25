@@ -63,6 +63,17 @@ try {
     $order_id = clean_input($_POST['order_id'] ?? '');
     logToConsole("Параметры: action={$action}, track={$tracking_number}, order_id={$order_id}");
 
+    // Обновление времени последней проверки
+    if (!empty($order_id)) {
+        try {
+            $stmt = $pdo->prepare("UPDATE orders SET last_status_check = NOW() WHERE id = ?");
+            $stmt->execute([$order_id]);
+            logToConsole("Время проверки обновлено для заказа {$order_id}");
+        } catch (PDOException $e) {
+            logToConsole("Ошибка при обновлении времени проверки: " . $e->getMessage());
+        }
+    }
+
     // Получение токена CDEK
     logToConsole("Получение токена авторизации CDEK...");
     $token = getCdekToken(CDEK_ACCOUNT, CDEK_SECURE_PASSWORD);
@@ -152,43 +163,52 @@ try {
 
     logToConsole("Статус получен: {$delivery_status} ({$status_code})");
 
-    // Обновление статуса заказа только при изменении
+    // Обновление статуса заказа
     if (!empty($order_id)) {
         try {
-            // Получаем текущий статус из базы
-            $stmt = $pdo->prepare("SELECT delivery_status_code FROM orders WHERE id = ?");
+            // Получение текущего статуса
+            $stmt = $pdo->prepare("SELECT status, delivery_status, delivery_status_code FROM orders WHERE id = ?");
             $stmt->execute([$order_id]);
-            $current_status_code = $stmt->fetchColumn();
+            $current_data = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Сравниваем текущий статус с новым
-            if ($current_status_code !== $status_code) {
-                // Подготовка данных для обновления
-                $updateParams = [
-                    ':order_id' => $order_id,
-                    ':delivery_status' => $delivery_status,
-                    ':delivery_status_code' => $status_code,
-                    ':last_status_check' => date('Y-m-d H:i:s')
-                ];
-                
-                $updateFields = [
-                    "delivery_status = :delivery_status",
-                    "delivery_status_code = :delivery_status_code",
-                    "last_status_check = :last_status_check"
-                ];
-                
-                // Обновление основного статуса при наличии
-                if ($internal_status) {
-                    $updateFields[] = "status = :status";
-                    $updateParams[':status'] = $internal_status;
-                }
-                
-                // Выполнение обновления
-                $sql = "UPDATE orders SET " . implode(', ', $updateFields) . " WHERE id = :order_id";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute($updateParams);
-                logToConsole("Статус заказа {$order_id} обновлен (статус изменился)");
-                
-                // Логирование в историю
+            $current_local_status = $current_data['status'];
+            $current_delivery_status = $current_data['delivery_status'];
+            $current_delivery_status_code = $current_data['delivery_status_code'];
+            
+            // Проверяем, изменился ли статус
+            $status_changed = ($delivery_status !== $current_delivery_status) || 
+                             ($status_code !== $current_delivery_status_code) ||
+                             ($internal_status && $internal_status !== $current_local_status);
+            
+            // Подготовка данных для обновления
+            $updateParams = [
+                ':order_id' => $order_id,
+                ':delivery_status' => $delivery_status,
+                ':delivery_status_code' => $status_code,
+                ':last_status_check' => date('Y-m-d H:i:s')
+            ];
+            
+            $updateFields = [
+                "delivery_status = :delivery_status",
+                "delivery_status_code = :delivery_status_code",
+                "last_status_check = :last_status_check"
+            ];
+            
+            // Обновление основного статуса при наличии
+            if ($internal_status) {
+                $updateFields[] = "status = :status";
+                $updateParams[':status'] = $internal_status;
+                $current_local_status = $internal_status;
+            }
+            
+            // Выполнение обновления
+            $sql = "UPDATE orders SET " . implode(', ', $updateFields) . " WHERE id = :order_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($updateParams);
+            logToConsole("Статус заказа {$order_id} обновлен");
+            
+            // Логирование в историю только если статус изменился
+            if ($status_changed) {
                 $logSql = "INSERT INTO delivery_logs 
                             (order_id, status_code, status_name, local_status, api_response) 
                            VALUES 
@@ -199,16 +219,14 @@ try {
                     ':order_id' => $order_id,
                     ':status_code' => $status_code,
                     ':status_name' => $delivery_status,
-                    ':local_status' => $internal_status,
+                    ':local_status' => $current_local_status,
                     ':api_response' => json_encode($result, JSON_UNESCAPED_UNICODE)
                 ]);
-                logToConsole("Лог доставки записан");
+                logToConsole("Лог доставки записан (статус изменился)");
             } else {
-                // Обновляем только время проверки если статус не изменился
-                $stmt = $pdo->prepare("UPDATE orders SET last_status_check = NOW() WHERE id = ?");
-                $stmt->execute([$order_id]);
-                logToConsole("Статус заказа {$order_id} не изменился, обновлено только время проверки");
+                logToConsole("Статус не изменился, лог не записывается");
             }
+            
         } catch (PDOException $e) {
             logToConsole("Ошибка БД при обновлении статуса: " . $e->getMessage());
             throw new Exception("Ошибка обновления статуса заказа");
