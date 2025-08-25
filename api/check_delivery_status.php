@@ -12,6 +12,9 @@ function logToConsole($message) {
     echo '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
 }
 
+// Путь к файлу лога
+$debug_log = '/tmp/delivery_status_check.log';
+
 try {
     logToConsole("Создание подключения к БД...");
     $pdo = new PDO(
@@ -52,10 +55,10 @@ try {
     
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $order_count = count($orders);
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Found orders: $order_count\n", FILE_APPEND);
+    logToConsole("Found orders: $order_count");
 
     if ($order_count === 0) {
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] No orders to process\n", FILE_APPEND);
+        logToConsole("No orders to process");
         exit(0);
     }
 
@@ -63,7 +66,7 @@ try {
         $order_id = $order['id'];
         $tracking_number = trim($order['tracking_number']);
         
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Processing order #$index: ID $order_id, Track: $tracking_number\n", FILE_APPEND);
+        logToConsole("Processing order: ID $order_id, Track: $tracking_number");
         
         $postData = [
             'action' => 'get_delivery_status',
@@ -71,8 +74,6 @@ try {
             'order_id' => $order_id,
             'internal' => 1  // Флаг внутреннего запроса
         ];
-        
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] POST data: " . print_r($postData, true) . "\n", FILE_APPEND);
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://pnevmatpro.ru/api/order_check_cdek.php');
@@ -87,20 +88,16 @@ try {
         $error = curl_error($ch);
         curl_close($ch);
         
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] HTTP code: $httpCode\n", FILE_APPEND);
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] cURL error: $error\n", FILE_APPEND);
-        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Response: " . substr($response, 0, 500) . "\n", FILE_APPEND);
+        logToConsole("HTTP code: $httpCode");
         
         if ($httpCode !== 200) {
-            file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Error processing order $order_id\n", FILE_APPEND);
+            logToConsole("Error processing order $order_id: $error");
         } else {
-            logToConsole("Тело ответа: " . substr($response, 0, 500));
-            
             $result = json_decode($response, true);
             if ($result['status'] === 'success') {
-                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Success: " . $result['data']['delivery_status'] . "\n", FILE_APPEND);
+                logToConsole("Success: " . $result['data']['delivery_status']);
             } else {
-                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] API error: " . $result['message'] . "\n", FILE_APPEND);
+                logToConsole("API error: " . $result['message']);
             }
         }
         
@@ -108,8 +105,8 @@ try {
         sleep(2);
     }
     
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Script finished\n", FILE_APPEND);
+    logToConsole("Script finished");
     
 } catch (Exception $e) {
-    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] CRITICAL ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
+    logToConsole("CRITICAL ERROR: " . $e->getMessage());
 }
