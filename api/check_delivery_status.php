@@ -46,13 +46,16 @@ try {
             LIMIT 20";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $orders = $stmt->fetchAll();
-
-    logToConsole("Найдено заказов: " . count($orders));
+    if (!$stmt->execute()) {
+        throw new Exception("SQL execution failed");
+    }
     
-    if (empty($orders)) {
-        logToConsole("Нет заказов для проверки");
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $order_count = count($orders);
+    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Found orders: $order_count\n", FILE_APPEND);
+
+    if ($order_count === 0) {
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] No orders to process\n", FILE_APPEND);
         exit(0);
     }
 
@@ -60,16 +63,7 @@ try {
         $order_id = $order['id'];
         $tracking_number = trim($order['tracking_number']);
         
-        // ИЗМЕНЕНО: Добавлена проверка на пустой трек-номер
-        if (empty($tracking_number)) {
-            logToConsole("Пропуск заказа ID: $order_id - пустой трек-номер");
-            // Обновляем время проверки чтобы не повторять часто
-            $stmt = $pdo->prepare("UPDATE orders SET last_status_check = NOW() WHERE id = ?");
-            $stmt->execute([$order_id]);
-            continue;
-        }
-        
-        logToConsole("Обработка заказа ID: $order_id, трек: $tracking_number");
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Processing order #$index: ID $order_id, Track: $tracking_number\n", FILE_APPEND);
         
         $postData = [
             'action' => 'get_delivery_status',
@@ -78,49 +72,44 @@ try {
             'internal' => 1  // Флаг внутреннего запроса
         ];
         
-        logToConsole("Отправка запроса к API...");
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] POST data: " . print_r($postData, true) . "\n", FILE_APPEND);
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://pnevmatpro.ru/api/order_check_cdek.php');
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/x-www-form-urlencoded',
-            'X-Internal-Request: true'  // Дополнительный заголовок
-        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Для отладки
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
         curl_close($ch);
         
-        logToConsole("Ответ API: HTTP $httpCode");
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] HTTP code: $httpCode\n", FILE_APPEND);
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] cURL error: $error\n", FILE_APPEND);
+        file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Response: " . substr($response, 0, 500) . "\n", FILE_APPEND);
         
-        if ($httpCode !== 200 || !$response) {
-            logToConsole("Ошибка CURL: " . ($error ?: "Пустой ответ"));
+        if ($httpCode !== 200) {
+            file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Error processing order $order_id\n", FILE_APPEND);
         } else {
             logToConsole("Тело ответа: " . substr($response, 0, 500));
             
             $result = json_decode($response, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                logToConsole("Ошибка декодирования JSON: " . json_last_error_msg());
+            if ($result['status'] === 'success') {
+                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Success: " . $result['data']['delivery_status'] . "\n", FILE_APPEND);
             } else {
-                if ($result['status'] === 'success') {
-                    logToConsole("Статус обновлен: " . $result['data']['delivery_status']);
-                } else {
-                    logToConsole("Ошибка API: " . ($result['message'] ?? 'Неизвестная ошибка'));
-                }
+                file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] API error: " . $result['message'] . "\n", FILE_APPEND);
             }
         }
         
+        // Пауза между запросами
         sleep(2);
     }
     
-    logToConsole("Обработка завершена");
+    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] Script finished\n", FILE_APPEND);
     
 } catch (Exception $e) {
-    logToConsole("Критическая ошибка: " . $e->getMessage());
-    exit(1);
+    file_put_contents($debug_log, "[" . date('Y-m-d H:i:s') . "] CRITICAL ERROR: " . $e->getMessage() . "\n", FILE_APPEND);
 }
