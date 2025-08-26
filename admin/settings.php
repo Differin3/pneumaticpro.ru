@@ -78,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
 
         logActivity($pdo, 'password_change', 'Администратор сменил пароль', $_SESSION['admin']['id']);
         $success = 'Пароль успешно изменен!';
-
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -109,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
 
         logActivity($pdo, 'profile_update', 'Администратор обновил профиль', $_SESSION['admin']['id']);
         $success = 'Профиль успешно обновлен!';
-
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -129,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_notifications'
 
         logActivity($pdo, 'notifications_update', 'Администратор обновил настройки уведомлений', $_SESSION['admin']['id']);
         $success = 'Настройки уведомлений обновлены!';
-
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -157,7 +154,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_telegram'])) {
 
         logActivity($pdo, 'telegram_settings_update', 'Администратор обновил настройки Telegram', $_SESSION['admin']['id']);
         $success = 'Настройки Telegram обновлены!';
-
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
@@ -176,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_telegram'])) {
         }
 
         logActivity($pdo, 'telegram_test_message', 'Администратор отправил тестовое сообщение в Telegram', $_SESSION['admin']['id']);
-
+        $success = 'Тестовое сообщение успешно отправлено в Telegram!';
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
