@@ -132,18 +132,27 @@ function logToFile($message, $level = 'INFO') {
 }
 
 function logActivity($pdo, $type, $description, $admin_id = null, $user_id = null) {
-    try {
-        $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
-        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+    $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
-        $stmt = $pdo->prepare("
-            INSERT INTO activity_log (user_id, admin_id, type, description, ip_address, user_agent, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, NOW())
-        ");
-        $stmt->execute([$user_id, $admin_id, $type, $description, $ip_address, $user_agent]);
+    try {
+        if ($user_id !== null) {
+            // Запись в пользовательский лог
+            $stmt = $pdo->prepare("
+                INSERT INTO user_activity_log (user_id, type, description, ip_address, user_agent, created_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([$user_id, $type, $description, $ip_address, $user_agent]);
+        } else {
+            // Запись в админский лог
+            $stmt = $pdo->prepare("
+                INSERT INTO activity_log (admin_id, type, description, ip_address, user_agent, created_at)
+                VALUES (?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([$admin_id, $type, $description, $ip_address, $user_agent]);
+        }
     } catch (PDOException $e) {
-        logToFile("Ошибка записи в activity_log: " . $e->getMessage(), "ERROR");
-        throw $e;
+        error_log("Ошибка записи в лог: " . $e->getMessage());
     }
 }
 

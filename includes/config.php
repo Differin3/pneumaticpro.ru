@@ -2,7 +2,7 @@
 // Устанавливаем имя сессии до начала работы с сессией
 
 // Режим разработки (true - вывод ошибок, false - продакшен)
-define('DEBUG_MODE', true);  // По умолчанию false для продакшена
+define('DEBUG_MODE', false);  // По умолчанию false для продакшена
 
 // Настройки отображения ошибок
 if (DEBUG_MODE) {
@@ -17,10 +17,10 @@ if (DEBUG_MODE) {
 // Укажите путь к error_log для всех режимов
 ini_set('error_log', __DIR__ . '/../logs/php_errors.log');  // Добавлено для логирования ошибок
 
-// Параметры подключения к базе данных
+// Параметры подключения к базе данных mariadb
 $db_host = 'localhost';
-$db_user = 'admin';
-$db_pass = '54785TGU647gj';
+$db_user = 'pnevmatpro.ru';
+$db_pass = 'pnevmatpro.ru';
 $db_name = 'airgun_service';
 $db_charset = 'utf8mb4';
 

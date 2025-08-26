@@ -16,6 +16,181 @@ $phone = htmlspecialchars($_GET['phone'] ?? (isset($_SESSION['user_id']) ? getUs
 $delivery_company = htmlspecialchars($_GET['delivery_company'] ?? 'cdek'); // Дефолтное значение 'cdek'
 $pickup_point = htmlspecialchars($_GET['pickup_point'] ?? '');
 
+// Обработка обновления количества товара
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update_cart') {
+    try {
+        if (!validate_csrf_token($_POST['csrf_token'])) {
+            throw new Exception('Ошибка безопасности: недействительный токен');
+        }
+
+        $product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+        $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 0;
+
+        if ($product_id <= 0 || $quantity < 0) {
+            throw new Exception('Некорректные данные для обновления корзины');
+        }
+
+        if ($quantity == 0) {
+            unset($_SESSION['cart'][$product_id]);
+        } else {
+            $_SESSION['cart'][$product_id]['quantity'] = $quantity;
+        }
+
+        // Логирование действия пользователя
+        if ($is_logged_in) {
+            $stmt = $pdo->prepare("SELECT name FROM products WHERE id = ?");
+            $stmt->execute([$product_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $product_name = $product['name'] ?? 'Неизвестный товар';
+            $description = $quantity == 0 ? 
+                "Пользователь удалил товар '$product_name' из корзины" : 
+                "Пользователь обновил количество товара '$product_name' на $quantity";
+            logActivity($pdo, 'cart_update', $description, null, $_SESSION['user_id']);
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+        exit;
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Обработка удаления товара из корзины
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'remove_from_cart') {
+    try {
+        if (!validate_csrf_token($_POST['csrf_token'])) {
+            throw new Exception('Ошибка безопасности: недействительный токен');
+        }
+
+        $product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+
+        if ($product_id <= 0) {
+            throw new Exception('Некорректный ID товара');
+        }
+
+        // Логирование действия пользователя
+        if ($is_logged_in) {
+            $stmt = $pdo->prepare("SELECT name FROM products WHERE id = ?");
+            $stmt->execute([$product_id]);
+            $product = $stmt->fetch(PDO::FETCH_ASSOC);
+            $product_name = $product['name'] ?? 'Неизвестный товар';
+            logActivity($pdo, 'cart_remove', "Пользователь удалил товар '$product_name' из корзины", null, $_SESSION['user_id']);
+        }
+
+        unset($_SESSION['cart'][$product_id]);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+        exit;
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
+// Обработка оформления заказа
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'place_order') {
+    try {
+        if (!validate_csrf_token($_POST['csrf_token'])) {
+            throw new Exception('Ошибка безопасности: недействительный токен');
+        }
+
+        if (!$is_logged_in) {
+            throw new Exception('Требуется авторизация для оформления заказа');
+        }
+
+        $fullname = trim($_POST['fullname'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $delivery_company = trim($_POST['delivery_company'] ?? '');
+        $pickup_point = trim($_POST['pickup_point'] ?? '');
+        $pickup_city = trim($_POST['pickup_city'] ?? '');
+        $pickup_point_code = trim($_POST['pickup_point_code'] ?? '');
+
+        if (!validate_name($fullname)) {
+            throw new Exception('Некорректное ФИО');
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Некорректный email');
+        }
+        if (!validate_phone($phone)) {
+            throw new Exception('Некорректный номер телефона');
+        }
+        if (!in_array($delivery_company, ['cdek', 'post'])) {
+            throw new Exception('Некорректная служба доставки');
+        }
+        if ($delivery_company === 'cdek' && (empty($pickup_point) || empty($pickup_point_code))) {
+            throw new Exception('Выберите пункт выдачи для СДЭК');
+        }
+
+        // Проверка корзины
+        if (empty($cart)) {
+            throw new Exception('Корзина пуста');
+        }
+
+        // Создание клиента
+        $stmt = $pdo->prepare("SELECT id FROM customers WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $customer = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$customer) {
+            $stmt = $pdo->prepare("INSERT INTO customers (user_id, full_name, phone, address) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $fullname, $phone, $pickup_point]);
+            $customer_id = $pdo->lastInsertId();
+        } else {
+            $customer_id = $customer['id'];
+            $stmt = $pdo->prepare("UPDATE customers SET full_name = ?, phone = ?, address = ? WHERE id = ?");
+            $stmt->execute([$fullname, $phone, $pickup_point, $customer_id]);
+        }
+
+        // Создание заказа
+        $order_number = 'ORD-' . time() . '-' . rand(1000, 9999);
+        $stmt = $pdo->prepare("
+            INSERT INTO orders (order_number, customer_id, total_amount, status, delivery_service, delivery_address, created_at)
+            VALUES (?, ?, ?, 'new', ?, ?, NOW())
+        ");
+        $stmt->execute([$order_number, $customer_id, $total_price, $delivery_company, $pickup_point]);
+        $order_id = $pdo->lastInsertId();
+
+        // Добавление товаров в заказ
+        foreach ($cart as $product_id => $item) {
+            if (isset($item['price'], $item['quantity'])) {
+                $stmt = $pdo->prepare("
+                    INSERT INTO order_items (order_id, product_id, quantity, price)
+                    VALUES (?, ?, ?, ?)
+                ");
+                $stmt->execute([$order_id, $product_id, $item['quantity'], $item['price']]);
+            }
+        }
+
+        // Логирование оформления заказа
+        if ($is_logged_in) {
+            logActivity($pdo, 'order_place', "Пользователь оформил заказ #$order_number на сумму " . number_format($total_price, 2) . " ₽", null, $_SESSION['user_id']);
+        }
+
+        // Очистка корзины
+        $_SESSION['cart'] = [];
+
+        // Отправка уведомления в Telegram
+        sendTelegramOrderNotification($pdo, $order_id);
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success', 'order_number' => $order_number]);
+        exit;
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        http_response_code(400);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        exit;
+    }
+}
+
 $total_price = 0;
 $total_items = 0;
 if (!empty($cart)) {
