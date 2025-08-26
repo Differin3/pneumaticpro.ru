@@ -34,9 +34,9 @@ try {
     $total_logs = $count_stmt->fetchColumn();
     $total_pages = ceil($total_logs / $per_page);
 
-    // Fetch logs with pagination
+    // Fetch logs with pagination, including user_agent
     $stmt = $pdo->prepare("
-        SELECT al.created_at, al.type, al.description, a.username AS admin_username, al.ip_address
+        SELECT al.created_at, al.type, al.description, a.username AS admin_username, al.ip_address, al.user_agent
         FROM activity_log al
         LEFT JOIN admins a ON al.admin_id = a.id
         ORDER BY al.created_at DESC
@@ -54,6 +54,7 @@ try {
         $log['description'] = htmlspecialchars($log['description']);
         $log['admin_username'] = htmlspecialchars($log['admin_username'] ?? '-');
         $log['ip_address'] = htmlspecialchars($log['ip_address'] ?? '-');
+        $log['user_agent'] = htmlspecialchars($log['user_agent'] ?? '');
     }
 
     // Формирование ответа

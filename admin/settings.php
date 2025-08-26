@@ -218,6 +218,7 @@ $csrf_token = generate_csrf_token();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrf_token) ?>">
     <title>Настройки | pnevmatpro.ru</title>
     <link rel="icon" href="data:,">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1042,93 +1043,115 @@ $csrf_token = generate_csrf_token();
                         'completed': 'Завершен',
                         'canceled': 'Отменен'
                     };
-                    
-                    tableHtml += `
-                        <tr>
-                            <td>${log.created_at}</td>
-                            <td><strong>${log.order_number}</strong></td>
-                            <td>
-                                <span class="status-badge status-cdek">${log.status_name}</span>
-                            </td>
-                            <td>
-                                <span class="status-badge status-local">${statusMap[log.local_status] || log.local_status || '-'}</span>
-                            </td>
-                            <td><span class="badge bg-dark">${log.status_code || '-'}</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-dark" onclick="showDeliveryDetails(${log.id})">
-                                    <i class="bi bi-info-circle"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-            
-            tableHtml += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            contentDiv.innerHTML = tableHtml;
-
-            // Пагинация
-            if (totalPages > 1) {
-                let paginationHtml = `
-                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="loadLogs('${logType}', ${currentPage - 1}); return false;">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-                `;
-
-                for (let i = 1; i <= totalPages; i++) {
-                    paginationHtml += `
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" onclick="loadLogs('${logType}', ${i}); return false;">${i}</a>
-                        </li>
-                    `;
+                    logs.forEach(log => {
+                        tableHtml += `
+                            <tr>
+                                <td>${log.created_at}</td>
+                                <td><strong>${log.order_number}</strong></td>
+                                <td><span class="status-badge status-cdek">${log.status_name}</span></td>
+                                <td><span class="status-badge status-local">${statusMap[log.local_status] || log.local_status || '-'}</span></td>
+                                <td><span class="badge bg-dark">${log.status_code || '-'}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-dark" onclick="showDeliveryDetails(${log.id})">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
                 }
 
-                paginationHtml += `
-                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="#" onclick="loadLogs('${logType}', ${currentPage + 1}); return false;">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
+                tableHtml += `
+                            </tbody>
+                        </table>
+                    </div>
                 `;
 
-                paginationDiv.innerHTML = paginationHtml;
-            } else {
-                paginationDiv.innerHTML = '';
-            }
-        };
+                contentDiv.innerHTML = tableHtml;
 
-        // Функция для показа деталей доставки
-        window.showDeliveryDetails = function(logId) {
-            alert('Детали доставки для записи ID: ' + logId + '\nЗдесь будет подробная информация о статусе доставки');
-            // В реальной реализации здесь будет запрос к API для получения деталей
-        };
+                if (totalPages > 1) {
+                    let paginationHtml = `
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="loadLogs('${logType}', ${currentPage - 1}); return false;">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                    `;
 
-        // Обработчики вкладок
-        document.getElementById('activity-log-tab').addEventListener('click', function() {
-            loadLogs('activity', 1);
+                    for (let i = 1; i <= totalPages; i++) {
+                        paginationHtml += `
+                            <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                <a class="page-link" href="#" onclick="loadLogs('${logType}', ${i}); return false;">${i}</a>
+                            </li>
+                        `;
+                    }
+
+                    paginationHtml += `
+                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="#" onclick="loadLogs('${logType}', ${currentPage + 1}); return false;">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    `;
+
+                    paginationDiv.innerHTML = paginationHtml;
+                } else {
+                    paginationDiv.innerHTML = '';
+                }
+            };
+
+            window.showDeliveryDetails = async function(logId) {
+                try {
+                    const formData = new FormData();
+                    formData.append('csrf_token', document.getElementById('csrfToken').value);
+                    formData.append('log_id', logId);
+
+                    const response = await fetch('get_delivery_log_details.php', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const data = await response.json();
+
+                    if (data.status !== 'success') throw new Error(data.message || 'Ошибка при загрузке деталей');
+
+                    const log = data.log;
+                    const apiResponse = data.api_response || {};
+                    const details = `
+                        <strong>ID записи:</strong> ${log.id}<br>
+                        <strong>Номер заказа:</strong> ${log.order_number}<br>
+                        <strong>Дата проверки:</strong> ${log.created_at}<br>
+                        <strong>Статус СДЭК:</strong> ${log.status_name}<br>
+                        <strong>Местный статус:</strong> ${log.local_status}<br>
+                        <strong>Код статуса:</strong> ${log.status_code || '-'}<br>
+                        <strong>Клиент:</strong> ${log.customer_name}<br>
+                        <strong>Телефон:</strong> ${log.customer_phone}<br>
+                        <strong>Трек-номер:</strong> ${log.tracking_number || '-'}<br>
+                        <strong>Служба доставки:</strong> ${log.delivery_service}<br>
+                        <strong>API-ответ:</strong> ${JSON.stringify(apiResponse, null, 2).replace(/\n/g, '<br>')}
+                    `;
+                    alert('Детали доставки:\n' + details);
+                } catch (error) {
+                    alert('Ошибка при загрузке деталей: ' + error.message);
+                }
+            };
+
+            document.getElementById('activity-log-tab').addEventListener('click', function() {
+                loadLogs('activity', 1);
+            });
+
+            document.getElementById('user-activity-log-tab').addEventListener('click', function() {
+                loadLogs('user-activity', 1);
+            });
+
+            document.getElementById('delivery-log-tab').addEventListener('click', function() {
+                loadLogs('delivery', 1);
+            });
         });
-
-        document.getElementById('user-activity-log-tab').addEventListener('click', function() {
-            loadLogs('user-activity', 1);
-        });
-
-        document.getElementById('delivery-log-tab').addEventListener('click', function() {
-            loadLogs('delivery', 1);
-        });
-
-        // Кнопка просмотра логов
-        document.getElementById('view-activity-log').addEventListener('click', function() {
-            const modal = new bootstrap.Modal('#activityLogModal');
-            modal.show();
-        });
-    });
-    </script>
+        </script>
 </body>
 </html>
