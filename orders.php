@@ -572,7 +572,7 @@ $delivery_service_map = [
                         <input type="hidden" name="action" value="change_profile">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                         <div class="mb-3">
-                            <label for="new_username" class="form-label">Имя пользователя</label>
+                            <label for="new_username" class="form-label">Имя пользователя(логин)</label>
                             <input type="text" class="form-control" id="new_username" name="new_username" 
                                    value="<?= htmlspecialchars($_SESSION['username']) ?>" required
                                    pattern="[A-Za-zА-Яа-я0-9_-]{3,50}">
