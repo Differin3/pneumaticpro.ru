@@ -752,7 +752,7 @@ $csrf_token = generate_csrf_token();
 
     <input type="hidden" id="csrfToken" value="<?= htmlspecialchars($csrf_token) ?>">
 
-    <!-- Обновленное модальное окно в стиле orders.php -->
+    <!-- Обновленное модальное окно с тремя вкладками -->
     <div class="modal fade" id="activityLogModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -766,7 +766,10 @@ $csrf_token = generate_csrf_token();
                 <div class="modal-header bg-light pt-0 border-bottom-0">
                     <ul class="nav nav-tabs card-header-tabs" id="logTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active text-dark fw-bold" id="activity-log-tab" data-bs-toggle="tab" data-bs-target="#activity-log" type="button" role="tab">Журнал действий</button>
+                            <button class="nav-link active text-dark fw-bold" id="activity-log-tab" data-bs-toggle="tab" data-bs-target="#activity-log" type="button" role="tab">Админ. действия</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-dark fw-bold" id="user-activity-log-tab" data-bs-toggle="tab" data-bs-target="#user-activity-log" type="button" role="tab">Пользовательские действия</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link text-dark fw-bold" id="delivery-log-tab" data-bs-toggle="tab" data-bs-target="#delivery-log" type="button" role="tab">Лог доставки</button>
@@ -782,7 +785,17 @@ $csrf_token = generate_csrf_token();
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="visually-hidden">Загрузка...</span>
                                     </div>
-                                    <p class="mt-2">Загрузка журнала действий...</p>
+                                    <p class="mt-2">Загрузка журнала действий администраторов...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="user-activity-log" role="tabpanel">
+                            <div id="user-activity-log-content" class="p-3">
+                                <div class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Загрузка...</span>
+                                    </div>
+                                    <p class="mt-2">Загрузка журнала действий пользователей...</p>
                                 </div>
                             </div>
                         </div>
@@ -889,7 +902,7 @@ $csrf_token = generate_csrf_token();
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Загрузка...</span>
                         </div>
-                        <p class="mt-2">Загрузка ${logType === 'activity' ? 'журнала действий' : 'лога доставки'}...</p>
+                        <p class="mt-2">Загрузка ${getLogTypeName(logType)}...</p>
                     </div>`;
 
                 const formData = new FormData();
@@ -897,7 +910,16 @@ $csrf_token = generate_csrf_token();
                 formData.append('page', page);
                 formData.append('per_page', 10);
 
-                const endpoint = logType === 'activity' ? 'get_activity_log.php' : 'get_delivery_log.php';
+                // Определяем endpoint в зависимости от типа лога
+                let endpoint;
+                if (logType === 'activity') {
+                    endpoint = 'get_activity_log.php';
+                } else if (logType === 'user-activity') {
+                    endpoint = 'get_user_activity_log.php';
+                } else if (logType === 'delivery') {
+                    endpoint = 'get_delivery_log.php';
+                }
+
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     body: formData
@@ -914,7 +936,7 @@ $csrf_token = generate_csrf_token();
                 console.error('Ошибка:', error);
                 contentDiv.innerHTML = `
                     <div class="alert alert-danger">
-                        <h5>Ошибка при загрузке ${logType === 'activity' ? 'журнала действий' : 'лога доставки'}</h5>
+                        <h5>Ошибка при загрузке ${getLogTypeName(logType)}</h5>
                         <p>${error.message}</p>
                         <button class="btn btn-sm btn-outline-primary" onclick="loadLogs('${logType}', ${page})">
                             <i class="bi bi-arrow-clockwise"></i> Попробовать снова
@@ -923,6 +945,16 @@ $csrf_token = generate_csrf_token();
                 paginationDiv.innerHTML = '';
             }
         };
+
+        // Вспомогательная функция для получения названия типа лога
+        function getLogTypeName(logType) {
+            const names = {
+                'activity': 'журнала действий администраторов',
+                'user-activity': 'журнала действий пользователей',
+                'delivery': 'лога доставки'
+            };
+            return names[logType] || 'логов';
+        }
 
         // Функция отрисовки логов
         window.renderLogs = function(logType, logs, totalPages, currentPage) {
@@ -937,9 +969,11 @@ $csrf_token = generate_csrf_token();
             }
             
             // Заголовок для таблицы
-            const headerText = logType === 'activity' 
-                ? 'История действий администраторов' 
-                : 'История статусов доставки';
+            const headerText = {
+                'activity': 'История действий администраторов',
+                'user-activity': 'История действий пользователей',
+                'delivery': 'История статусов доставки'
+            }[logType];
             
             let tableHtml = `
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -958,6 +992,16 @@ $csrf_token = generate_csrf_token();
                         <th>Тип</th>
                         <th>Описание</th>
                         <th>Администратор</th>
+                        <th>IP-адрес</th>
+                    </tr>
+                `;
+            } else if (logType === 'user-activity') {
+                tableHtml += `
+                    <tr>
+                        <th>Дата и время</th>
+                        <th>Тип</th>
+                        <th>Описание</th>
+                        <th>Пользователь</th>
                         <th>IP-адрес</th>
                     </tr>
                 `;
@@ -987,6 +1031,18 @@ $csrf_token = generate_csrf_token();
                             <td><span class="badge bg-secondary">${log.type}</span></td>
                             <td>${log.description}</td>
                             <td>${log.admin_username || '-'}</td>
+                            <td><code>${log.ip_address}</code></td>
+                        </tr>
+                    `;
+                });
+            } else if (logType === 'user-activity') {
+                logs.forEach(log => {
+                    tableHtml += `
+                        <tr>
+                            <td>${log.created_at}</td>
+                            <td><span class="badge bg-info">${log.type}</span></td>
+                            <td>${log.description}</td>
+                            <td>${log.username || '-'}</td>
                             <td><code>${log.ip_address}</code></td>
                         </tr>
                     `;
@@ -1073,6 +1129,10 @@ $csrf_token = generate_csrf_token();
         // Обработчики вкладок
         document.getElementById('activity-log-tab').addEventListener('click', function() {
             loadLogs('activity', 1);
+        });
+
+        document.getElementById('user-activity-log-tab').addEventListener('click', function() {
+            loadLogs('user-activity', 1);
         });
 
         document.getElementById('delivery-log-tab').addEventListener('click', function() {
