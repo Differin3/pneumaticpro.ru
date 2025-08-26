@@ -20,24 +20,12 @@
     object-fit: cover;
     width: 100%;
 }
-.logo-float {
-    animation: float 6s ease-in-out infinite;
-    max-width: 100%;
-    height: auto;
-}
 .hero {
     padding: 2rem 0;
-}
-.logo-float {
-    max-width: 100%;
-    height: auto;
 }
 @media (max-width: 768px) {
     .hero {
         padding: 1.5rem 0;
-    }
-    .logo-float {
-        width: 280px;
     }
 }
 .btn-lg {
@@ -109,14 +97,10 @@ section {
     border: 1px solid #007bff;
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;
-    transition: all 0.5s ease-in-out;
     text-decoration: none;
     display: inline-block;
-    transform: translate3d(0px, 0px, 20px);
-    transform-style: preserve-3d;
 }
 .detail-btn:hover {
-    transform: translate3d(0px, 0px, 60px);
     background-color: #007bff;
     color: #fff;
     text-decoration: none;
@@ -126,42 +110,32 @@ section {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Updated 3D Card Styles */
+/* Updated Card Styles */
 .parent {
     width: 100%;
     max-width: 300px;
     padding: 20px;
-    perspective: 1000px;
     margin: 0 auto;
 }
 
 .card {
-    transform-style: preserve-3d;
-    transition: all 0.5s ease-in-out;
     position: relative;
     z-index: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); /* Simplified shadow for flat appearance */
 }
 
-.card:hover {
-    transform: rotate3d(0.5, 1, 0, 15deg);
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 20px 30px -10px;
-}
-
-/* Сохранение стандартных стилей карточек */
+/* Remove all transform effects for cards */
 .card-img-top, .img-placeholder {
     transform: none !important;
-    transition: none !important;
 }
 
 .card-body h5.card-title, 
 .card-body h3.h4 {
     transform: none !important;
-    transition: none !important;
 }
 
 .card-body p.card-text {
     transform: none !important;
-    transition: none !important;
 }
 
 .card-body .order-service,
@@ -171,38 +145,25 @@ section {
 .card-body .service-meta .badge,
 .card-body .h4.text-accent {
     transform: none !important;
-    transition: none !important;
 }
 
 .card .badge {
     transform: none !important;
-    transition: none !important;
     z-index: 2;
 }
 
-/* Адаптация под мобильные устройства */
-@media (max-width: 576px) {
-    .parent {
-        max-width: 280px;
-        padding: 15px;
-    }
-    
-    .card:hover {
-        transform: rotate3d(0.3, 0.7, 0, 12deg);
-    }
-}
-
-/* Fallback для браузеров без поддержки 3D */
-@supports not (transform-style: preserve-3d) {
-    .card, .card:hover {
-        transform: none !important;
-    }
+/* Remove float animation for logo and other elements */
+.logo-float {
+    max-width: 100%;
+    height: auto;
+    animation: none !important; /* Disable float animation */
 }
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .parent {
         max-width: 280px;
+        padding: 15px;
     }
     .card .content-box {
         padding: 50px 20px 20px 20px;
@@ -244,120 +205,4 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.privacy-card {
-    --shadow: rgba(60, 64, 67, 0.3) 0 1px 2px 0,
-      rgba(60, 64, 67, 0.15) 0 2px 6px 2px;
-    width: 80%;
-    max-width: 300px;
-    background-color: white;
-    border-radius: 1.5rem;
-    box-shadow: var(--shadow);
-    margin: 20px auto;
-    z-index: 9999;
-}
-
-.content {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 2rem 1.5rem;
-    position: relative;
-}
-
-.icon {
-    position: relative;
-    margin: -2.5rem auto 1.5rem;
-    height: 36px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.icon svg {
-    width: 65px;
-    height: 46px;
-}
-
-.title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    text-align: left;
-    color: #4b5563;
-}
-
-.description {
-    width: 100%;
-    margin-bottom: 2.5rem;
-    font-size: 0.875rem;
-    text-align: justify;
-    color: #4b5563;
-}
-
-.privacy-link {
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #634647;
-    transition: color 0.3s;
-}
-
-.privacy-link:hover {
-    color: #845556;
-    text-decoration: underline;
-}
-
-.more-options {
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    color: #4b5563;
-    cursor: pointer;
-    font-weight: 600;
-    transition: color 0.3s;
-    position: absolute;
-    left: 1.5rem;
-    bottom: 1.5rem;
-    background: transparent;
-    border: 0;
-}
-
-.more-options:hover {
-    color: #634647;
-    text-decoration: underline;
-}
-
-.accept-button {
-    position: absolute;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    padding: 0.5rem 2rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #634647;
-    background-color: #ddad81;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-.accept-button:hover {
-    background-color: #634647;
-    color: #ddad81;
-}
-
-@media (max-width: 576px) {
-    .privacy-card {
-        width: 90%;
-        max-width: 280px;
-    }
-    .icon {
-        height: 32px;
-        margin: -1.5rem auto 1.2rem;
-    }
-    .icon svg {
-        transform: translateY(-8px);
-    }
 }

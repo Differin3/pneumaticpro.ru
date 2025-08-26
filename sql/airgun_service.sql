@@ -22,7 +22,6 @@ USE `airgun_service`;
 -- Дамп структуры для таблица airgun_service.activity_log
 CREATE TABLE IF NOT EXISTS `activity_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned DEFAULT NULL,
   `admin_id` int(10) unsigned DEFAULT NULL,
   `type` varchar(50) NOT NULL,
   `description` text NOT NULL,
@@ -30,11 +29,9 @@ CREATE TABLE IF NOT EXISTS `activity_log` (
   `user_agent` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `fk_activity_log_user_idx` (`user_id`),
   KEY `fk_activity_log_admin_idx` (`admin_id`),
-  CONSTRAINT `fk_activity_log_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_activity_log_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=157 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `fk_activity_log_admin` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -109,10 +106,11 @@ CREATE TABLE IF NOT EXISTS `delivery_logs` (
   `status_name` varchar(255) NOT NULL,
   `api_response` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`api_response`)),
   `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `local_status` varchar(50) NOT NULL DEFAULT 'processing' COMMENT 'Локальный статус заказа',
   PRIMARY KEY (`id`),
   KEY `idx_order_status` (`order_id`,`status_code`),
   CONSTRAINT `fk_delivery_logs_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -177,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   KEY `fk_orders_customer_idx` (`customer_id`),
   KEY `idx_orders_date` (`created_at`),
   CONSTRAINT `fk_orders_customer` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -194,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `order_history` (
   KEY `admin_id` (`admin_id`),
   CONSTRAINT `order_history_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `order_history_ibfk_2` FOREIGN KEY (`admin_id`) REFERENCES `admins` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -214,7 +212,7 @@ CREATE TABLE IF NOT EXISTS `order_items` (
   CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_order_items_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_order_items_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -302,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `server_logs` (
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_timestamp` (`timestamp`)
-) ENGINE=InnoDB AUTO_INCREMENT=68578 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=86120 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
@@ -387,6 +385,22 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Экспортируемые данные не выделены.
+
+-- Дамп структуры для таблица airgun_service.user_activity_log
+CREATE TABLE IF NOT EXISTS `user_activity_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `description` text NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `fk_user_activity_log_user_idx` (`user_id`),
+  CONSTRAINT `fk_user_activity_log_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Экспортируемые данные не выделены.
 
