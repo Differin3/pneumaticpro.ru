@@ -25,44 +25,21 @@ try {
 }
 
 try {
-    $stmt = $pdo->query("SELECT `key`, `value` FROM settings WHERE `key` IN ('store_name', 'telegram_bot_token', 'telegram_chat_id', 'cdek_account', 'cdek_secure_password')");
+    $stmt = $pdo->query("SELECT `key`, `value` FROM settings WHERE `key` IN ('telegram_bot_token', 'telegram_chat_id', 'cdek_account', 'cdek_secure_password')");
     $settings = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
-    $shop_name = $settings['store_name'] ?? 'pnevmatpro.ru';
     $telegram_bot_token = $settings['telegram_bot_token'] ?? '';
     $telegram_chat_id = $settings['telegram_chat_id'] ?? '7071144296';
     $cdek_account = $settings['cdek_account'] ?? '';
     $cdek_secure_password = $settings['cdek_secure_password'] ?? '';
 } catch (PDOException $e) {
     $error = "Ошибка загрузки настроек: " . $e->getMessage();
-    $shop_name = 'pnevmatpro.ru';
     $telegram_bot_token = '';
     $telegram_chat_id = '7071144296';
     $cdek_account = '';
     $cdek_secure_password = '';
-}
-
-$items_per_page = 10;
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-try {
-    $sql = "SELECT `key`, `value`, `description`, `type`, `group` FROM settings 
-            ORDER BY `group`, `key` 
-            LIMIT :limit OFFSET :offset";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':limit', $items_per_page, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', ($current_page - 1) * $items_per_page, PDO::PARAM_INT);
-    $stmt->execute();
-    $all_settings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $count_sql = "SELECT COUNT(*) FROM settings";
-    $count_stmt = $pdo->query($count_sql);
-    $total_settings = $count_stmt->fetchColumn();
-} catch (PDOException $e) {
-    $error = "Ошибка загрузки настроек: " . $e->getMessage();
-    $all_settings = [];
-    $total_settings = 0;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
@@ -228,31 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cdek'])) {
 
         logActivity($pdo, 'cdek_settings_update', 'Администратор обновил настройки СДЭК', $_SESSION['admin']['id']);
         $success = 'Настройки СДЭК обновлены!';
-
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-    }
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_shop'])) {
-    try {
-        if (!validate_csrf_token($_POST['csrf_token'])) {
-            throw new Exception('Ошибка безопасности: недействительный токен');
-        }
-
-        $shop_name = trim($_POST['shop_name']);
-
-        if (empty($shop_name)) {
-            throw new Exception('Название магазина обязательно');
-        }
-
-        $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('store_name', ?) 
-                       ON DUPLICATE KEY UPDATE `value` = ?")
-            ->execute([$shop_name, $shop_name]);
-
-        logActivity($pdo, 'shop_settings_update', 'Администратор обновил настройки магазина', $_SESSION['admin']['id']);
-        $success = 'Настройки магазина обновлены!';
-
     } catch (Exception $e) {
         $error = $e->getMessage();
     }
