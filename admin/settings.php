@@ -269,7 +269,7 @@ $csrf_token = generate_csrf_token();
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.3rem; /* Уменьшенный отступ между иконками и текстом */
         }
 
         .user-agent-icon {
@@ -280,6 +280,10 @@ $csrf_token = generate_csrf_token();
         .user-agent-text {
             font-size: 0.9rem;
             color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px; /* Ограничение ширины текста для предотвращения переполнения */
         }
 
         @media (max-width: 576px) {
@@ -312,6 +316,7 @@ $csrf_token = generate_csrf_token();
 
             .user-agent-text {
                 font-size: 0.8rem;
+                max-width: 120px; /* Меньшая ширина для мобильных устройств */
             }
         }
 
@@ -791,6 +796,7 @@ $csrf_token = generate_csrf_token();
                     console.log('User Agent is empty or undefined');
                     return {
                         icon: '<i class="bi bi-question-circle user-agent-icon" title="Неизвестно"></i>',
+                        osIcon: '<i class="bi bi-question-circle user-agent-icon" title="Неизвестно"></i>',
                         text: 'Неизвестно',
                         os: 'Неизвестно'
                     };
@@ -801,22 +807,28 @@ $csrf_token = generate_csrf_token();
 
                 let browserInfo = {};
                 let os = 'Неизвестно';
+                let osIcon = '<i class="bi bi-question-circle user-agent-icon" title="Неизвестно"></i>';
 
                 // Определение ОС
                 if (userAgent.includes('windows nt')) {
                     os = 'Windows';
+                    osIcon = '<i class="bi bi-windows user-agent-icon" title="Windows"></i>';
                     if (userAgent.includes('windows nt 10.0')) os = 'Windows 10/11';
                     else if (userAgent.includes('windows nt 6.3')) os = 'Windows 8.1';
                     else if (userAgent.includes('windows nt 6.2')) os = 'Windows 8';
                     else if (userAgent.includes('windows nt 6.1')) os = 'Windows 7';
                 } else if (userAgent.includes('macintosh') || userAgent.includes('mac os x')) {
                     os = 'macOS';
+                    osIcon = '<i class="bi bi-apple user-agent-icon" title="macOS"></i>';
                 } else if (userAgent.includes('linux') && !userAgent.includes('android')) {
                     os = 'Linux';
+                    osIcon = '<i class="bi bi-ubuntu user-agent-icon" title="Linux"></i>';
                 } else if (userAgent.includes('android')) {
                     os = 'Android';
+                    osIcon = '<i class="bi bi-android2 user-agent-icon" title="Android"></i>';
                 } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
                     os = 'iOS';
+                    osIcon = '<i class="bi bi-apple user-agent-icon" title="iOS"></i>';
                 }
 
                 // Определение браузера
@@ -859,6 +871,7 @@ $csrf_token = generate_csrf_token();
 
                 return {
                     icon: browserInfo.icon,
+                    osIcon: osIcon,
                     text: `${browserInfo.text}, ${os}`,
                     os: os
                 };
@@ -1011,7 +1024,7 @@ $csrf_token = generate_csrf_token();
                                 <td>${log.description}</td>
                                 <td>${log.admin_username || '-'}</td>
                                 <td><code>${log.ip_address}</code></td>
-                                <td><div class="user-agent-container">${userAgentInfo.icon} <span class="user-agent-text">${userAgentInfo.text}</span></div></td>
+                                <td><div class="user-agent-container">${userAgentInfo.icon}${userAgentInfo.osIcon} <span class="user-agent-text">${userAgentInfo.text}</span></div></td>
                             </tr>
                         `;
                     });
@@ -1026,7 +1039,7 @@ $csrf_token = generate_csrf_token();
                                 <td>${log.description}</td>
                                 <td>${log.username || '-'}</td>
                                 <td><code>${log.ip_address}</code></td>
-                                <td><div class="user-agent-container">${userAgentInfo.icon} <span class="user-agent-text">${userAgentInfo.text}</span></div></td>
+                                <td><div class="user-agent-container">${userAgentInfo.icon}${userAgentInfo.osIcon} <span class="user-agent-text">${userAgentInfo.text}</span></div></td>
                             </tr>
                         `;
                     });
